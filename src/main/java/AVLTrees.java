@@ -28,21 +28,14 @@ public class AVLTrees {
         if(root == null){
             return new AVLNodeTree(value);
         }
-
         if(value < root.value){
             root.leftChild = insert(root.leftChild,value);
         } else{
             root.rightChild = insert(root.rightChild,value);
         }
-        root.height = Math.max(height(root.leftChild),height(root.rightChild)) + 1;
+        setHeight(root);
 
-        if(isLeftHeavy(root)){
-            System.out.println(root.value + "Is Left heavy ");
-        } else if (isRightHeavy(root)) {
-            System.out.println(root.value + "is right heacy");
-        }
-        return root;
-
+        return  balance(root);
     }
 
     private int height(AVLNodeTree node){
@@ -60,4 +53,43 @@ public class AVLTrees {
         return (node == null) ? 0 : height(node.leftChild) - height(node.rightChild);
     }
 
+    private AVLNodeTree balance(AVLNodeTree root){
+        if(isLeftHeavy(root)){
+            System.out.println(root.value + "Is Left heavy ");
+            if (balancer(root.leftChild) < 0){
+               root.leftChild = rotateLeft(root.leftChild);
+            }
+             return rotateRight(root);
+        } else if (isRightHeavy(root)) {
+            System.out.println(root.value + "is right heacy");
+            if (balancer(root.rightChild) > 0){
+                root.rightChild = rotateRight(root.rightChild);
+            }
+            return rotateLeft(root);
+        }
+
+        return root;
+    }
+
+    private AVLNodeTree rotateLeft(AVLNodeTree root){
+        var newRoot = root.rightChild;
+        root.leftChild = newRoot.leftChild;
+        newRoot.leftChild = root;
+        setHeight(root);
+        setHeight(newRoot);
+
+        return newRoot;
+    }
+    private AVLNodeTree rotateRight(AVLNodeTree root){
+        var newRoot = root.leftChild;
+        root.leftChild = newRoot.rightChild;
+        newRoot.rightChild = root;
+        setHeight(root);
+        setHeight(newRoot);
+        return newRoot;
+    }
+
+    private void setHeight(AVLNodeTree root){
+        root.height = Math.max(height(root.leftChild),height(root.rightChild)) + 1;
+    }
 }
